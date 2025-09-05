@@ -17,26 +17,22 @@ initial_estimate = 0.0  # 初始估计值
 # 初始化nws数组，用于存储迭代结果
 nws = np.zeros(n_iterations)
 etas = np.zeros(n_iterations)
-current_estimate = initial_estimate
+nws[1] = 0.0
 
 # 进行迭代计算
-for i in range(n_iterations):
-    # 生成当前迭代的噪声：使用[-2, 2]均匀分布替代正态分布[6,7](@ref)
+for i in range(2, n_iterations):
     eta = np.random.normal(loc=0, scale=1)
     
-    # 计算当前估计点处的带噪声函数值
-    noisy_observation = g(current_estimate) + eta
+    noisy_observation = g(nws[i-1]) + eta
     
-    # Robbins-Monro 更新步骤
-    step_size = 1/(i+1)  # 确保不为零
-    current_estimate = current_estimate - step_size * noisy_observation
+    step_size = 1/(i)
+    step = step_size * noisy_observation
+    nws[i] = nws[i-1] - step
     
-    # 存储当前估计值
-    nws[i] = current_estimate
     etas[i] = eta
 
 # 打印最终估计值
-print(f"Final estimate: {current_estimate}")
+print(f"Final estimate: {nws[n_iterations - 1]}")
 print(f"True root: {5**(1/3)}")
 
 # 创建图形
